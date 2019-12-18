@@ -1,4 +1,6 @@
 # goldmark-attributes
+[![GoDoc](https://godoc.org/github.com/mdigger/goldmark-attributes?status.svg)](https://godoc.org/github.com/mdigger/goldmark-attributes)
+
 [GoldMark](https://github.com/yuin/goldmark/) block attributes extension.
 
 ```markdown
