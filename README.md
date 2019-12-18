@@ -5,12 +5,16 @@
 # Document {#main}
 
 {.epigraph}
-> Why, you may take the most gallant sailor, the most intrepid airman or the most audacious soldier, put them at a table together – what do you get? The sum of their fears.
+> Why, you may take the most gallant sailor, the most intrepid airman or the
+> most audacious soldier, put them at a table together – what do you get? The
+> sum of their fears.
 ```
 
 ```html
 <h1 id="main">Document</h1>
-<blockquote class="epigraph"><p>Why, you may take the most gallant sailor, the most intrepid airman or the most audacious soldier, put them at a table together – what do you get? The sum of their fears.</p>
+<blockquote class="epigraph"><p>Why, you may take the most gallant sailor, the
+most intrepid airman or the most audacious soldier, put them at a table 
+together – what do you get? The sum of their fears.</p>
 </blockquote>
 ```
 
