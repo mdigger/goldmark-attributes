@@ -56,16 +56,21 @@ var DefaultNodeKinds = []ast.NodeKind{
 	east.KindTable, east.KindDefinitionList,
 }
 
-// Enable implement markdown block attributes support.
+// Extension implement markdown block attributes support.
 // Params define a list of supported node types.
 // If nil, DefaultNodeKinds are used.
-func Enable(nodes ...ast.NodeKind) *Attributes {
+func Extension(nodes ...ast.NodeKind) *Attributes {
 	if len(nodes) == 0 {
 		nodes = DefaultNodeKinds
 	}
 	return &Attributes{
 		supportedTypes: nodes,
 	}
+}
+
+// Options return initialized goldmark.Option with block attributes support.
+func Options(nodes ...ast.NodeKind) goldmark.Option {
+	return goldmark.WithExtensions(Extension(nodes...))
 }
 
 func (a *Attributes) isSupported(k ast.NodeKind) bool {
