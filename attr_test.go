@@ -1,16 +1,16 @@
-package attrs_test
+package attributes_test
 
 import (
 	"log"
 	"os"
 
-	attrs "github.com/mdigger/goldmark-attributes"
+	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
 )
 
 func Example() {
 	var md = goldmark.New(
-		goldmark.WithExtensions(attrs.BlockAttributes()),
+		goldmark.WithExtensions(attributes.Enable()),
 	)
 	var source = []byte("{#id .class1}\ntext")
 	err := md.Convert(source, os.Stdout)

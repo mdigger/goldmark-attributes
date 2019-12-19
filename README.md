@@ -22,7 +22,7 @@ together – what do you get? The sum of their fears.</p>
 
 ```go
 var md = goldmark.New(
-    goldmark.WithExtensions(attrs.BlockAttributes()),
+    goldmark.WithExtensions(attributes.Enable()),
 )
 var source = []byte("{#id .class1}\ntext")
 err := md.Convert(source, os.Stdout)

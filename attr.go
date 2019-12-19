@@ -1,10 +1,10 @@
-// Package attrs is a extension for the goldmark
+// Package attributes is a extension for the goldmark
 // (http://github.com/yuin/goldmark).
 //
 // This extension adds support for block attributes in markdowns.
 //  {#id .class option="value"}
 //  paragraph text with attributes
-package attrs
+package attributes
 
 import (
 	"github.com/yuin/goldmark"
@@ -56,10 +56,10 @@ var DefaultNodeKinds = []ast.NodeKind{
 	east.KindTable, east.KindDefinitionList,
 }
 
-// BlockAttributes implement markdown block Attributes support.
+// Enable implement markdown block attributes support.
 // Params define a list of supported node types.
 // If nil, DefaultNodeKinds are used.
-func BlockAttributes(nodes ...ast.NodeKind) *Attributes {
+func Enable(nodes ...ast.NodeKind) *Attributes {
 	if len(nodes) == 0 {
 		nodes = DefaultNodeKinds
 	}
