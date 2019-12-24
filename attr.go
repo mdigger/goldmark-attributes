@@ -151,11 +151,11 @@ func (a *attrRender) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 		})
 }
 
-// attributes defines a markdown block attributes parser, render & extension.
-type attributes struct{}
+// extension defines a goldmark.Extender for markdown block attributes.
+type extension struct{}
 
 // Extend implement goldmark.Extender interface.
-func (a *attributes) Extend(m goldmark.Markdown) {
+func (a *extension) Extend(m goldmark.Markdown) {
 	m.Parser().AddOptions(
 		parser.WithBlockParsers(
 			util.Prioritized(defaultAttrParser, 100)),
@@ -171,7 +171,7 @@ func (a *attributes) Extend(m goldmark.Markdown) {
 }
 
 // Extension is a goldmark.Extender with markdown block attributes support.
-var Extension goldmark.Extender = new(attributes)
+var Extension goldmark.Extender = new(extension)
 
 // Enable is a goldmark.Option with block attributes support.
 var Enable goldmark.Option = goldmark.WithExtensions(Extension)
