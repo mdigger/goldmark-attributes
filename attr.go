@@ -15,12 +15,12 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
-// Block parsed block.
+// Block parsed attributes block.
 type Block struct {
 	ast.BaseBlock
 }
 
-// New return new attribute block.
+// New return new attributes block.
 func New() *Block {
 	return &Block{
 		BaseBlock: ast.BaseBlock{},
@@ -41,7 +41,7 @@ func (a *Block) Dump(source []byte, level int) {
 	ast.DumpHelper(a, source, level, list, nil)
 }
 
-// KindAttributes is a NodeKind of the Attributes node.
+// KindAttributes is a NodeKind of the attributes block node.
 var KindAttributes = ast.NewNodeKind("Attributes")
 
 // Kind implements Node.Kind.
@@ -53,7 +53,7 @@ type attrParser struct{}
 
 var defaultAttrParser = new(attrParser)
 
-// NewParser return new attribute block parser.
+// NewParser return new attributes block parser.
 func NewParser() parser.BlockParser {
 	return defaultAttrParser
 }
