@@ -15,7 +15,7 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
-// Block parsed attributes block.
+// Block are parsed attributes block.
 type Block struct {
 	ast.BaseBlock
 }
@@ -51,11 +51,11 @@ func (a *Block) Kind() ast.NodeKind {
 
 type attrParser struct{}
 
-var defaultAttrParser = new(attrParser)
+var defaultParser = new(attrParser)
 
 // NewParser return new attributes block parser.
 func NewParser() parser.BlockParser {
-	return defaultAttrParser
+	return defaultParser
 }
 
 // Trigger implement parser.BlockParser interface.
@@ -135,11 +135,11 @@ func (a *transformer) Transform(node *ast.Document, reader text.Reader, pc parse
 
 type attrRender struct{}
 
-var defaultAttrRender = new(attrRender)
+var defaultRenderer = new(attrRender)
 
-// NewRender return new attributes block renderer.
-func NewRender() renderer.NodeRenderer {
-	return defaultAttrRender
+// NewRenderer return new attributes block renderer.
+func NewRenderer() renderer.NodeRenderer {
+	return defaultRenderer
 }
 
 // RegisterFuncs implement renderer.NodeRenderer interface.
@@ -158,14 +158,14 @@ type extension struct{}
 func (a *extension) Extend(m goldmark.Markdown) {
 	m.Parser().AddOptions(
 		parser.WithBlockParsers(
-			util.Prioritized(defaultAttrParser, 100)),
+			util.Prioritized(defaultParser, 100)),
 		parser.WithASTTransformers(
 			util.Prioritized(defaultTransformer, 100),
 		),
 	)
 	m.Renderer().AddOptions(
 		renderer.WithNodeRenderers(
-			util.Prioritized(defaultAttrRender, 100),
+			util.Prioritized(defaultRenderer, 100),
 		),
 	)
 }
@@ -174,4 +174,4 @@ func (a *extension) Extend(m goldmark.Markdown) {
 var Extension goldmark.Extender = new(extension)
 
 // Enable is a goldmark.Option with block attributes support.
-var Enable goldmark.Option = goldmark.WithExtensions(Extension)
+var Enable = goldmark.WithExtensions(Extension)

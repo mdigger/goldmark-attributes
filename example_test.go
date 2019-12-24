@@ -9,11 +9,14 @@ import (
 )
 
 func Example() {
+	var source = []byte(`
+{#id .class}
+text
+`)
 	var md = goldmark.New(attributes.Enable)
-	var source = []byte("{#id .class1}\ntext")
 	err := md.Convert(source, os.Stdout)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Output: <p id="id" class="class1">text</p>
+	// Output: <p id="id" class="class">text</p>
 }
