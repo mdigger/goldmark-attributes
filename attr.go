@@ -9,20 +9,26 @@ package attributes
 import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
-	east "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
 
-// attributesBlock parsed block.
-type attributesBlock struct {
+// Block parsed block.
+type Block struct {
 	ast.BaseBlock
 }
 
+// New return new attribute block.
+func New() *Block {
+	return &Block{
+		BaseBlock: ast.BaseBlock{},
+	}
+}
+
 // Dump implements Node.Dump.
-func (a *attributesBlock) Dump(source []byte, level int) {
+func (a *Block) Dump(source []byte, level int) {
 	attrs := a.Attributes()
 	list := make(map[string]string, len(attrs))
 	for _, attr := range attrs {
@@ -35,159 +41,137 @@ func (a *attributesBlock) Dump(source []byte, level int) {
 	ast.DumpHelper(a, source, level, list, nil)
 }
 
-// kindAttributes is a NodeKind of the Attributes node.
-var kindAttributes = ast.NewNodeKind("Attributes")
+// KindAttributes is a NodeKind of the Attributes node.
+var KindAttributes = ast.NewNodeKind("Attributes")
 
 // Kind implements Node.Kind.
-func (a *attributesBlock) Kind() ast.NodeKind {
-	return kindAttributes
+func (a *Block) Kind() ast.NodeKind {
+	return KindAttributes
 }
 
-// Attributes defines a markdown block attributes parser, render & extension.
-type Attributes struct {
-	supportedTypes []ast.NodeKind
-}
+type attrParser struct{}
 
-// DefaultNodeKinds contains a list of the default supported block element
-// types.
-var DefaultNodeKinds = []ast.NodeKind{
-	ast.KindBlockquote, ast.KindHeading, ast.KindList,
-	ast.KindParagraph, ast.KindThematicBreak,
-	east.KindTable, east.KindDefinitionList,
-}
+var defaultAttrParser = new(attrParser)
 
-// Extension implement markdown block attributes support.
-// Params define a list of supported node types.
-// If nil, DefaultNodeKinds are used.
-func Extension(nodes ...ast.NodeKind) *Attributes {
-	if len(nodes) == 0 {
-		nodes = DefaultNodeKinds
-	}
-	return &Attributes{
-		supportedTypes: nodes,
-	}
-}
-
-// Enable return initialized goldmark.Option with block attributes support.
-func Enable(nodes ...ast.NodeKind) goldmark.Option {
-	return goldmark.WithExtensions(Extension(nodes...))
-}
-
-func (a *Attributes) isSupported(k ast.NodeKind) bool {
-	for _, t := range a.supportedTypes {
-		if t == k {
-			return true
-		}
-	}
-	return false
-}
-
-// Transform implement parser.Transformer interface.
-func (a *Attributes) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
-	a.walkAtributes(node)
-}
-
-func (a *Attributes) walkAtributes(node ast.Node) {
-	for node = node.FirstChild(); node != nil; node = node.NextSibling() {
-		if node.Kind() == kindAttributes {
-			attrs := node.Attributes() // get attributes
-			next := node.NextSibling() // next node
-			// remove attributes node
-			if p := node.Parent(); p != nil {
-				p.RemoveChild(p, node)
-			}
-			if next == nil {
-				break
-			}
-			node = next
-			if node.Type() == ast.TypeBlock &&
-				!node.HasBlankPreviousLines() &&
-				a.isSupported(node.Kind()) {
-				// set attribute to sibling node
-				for _, attr := range attrs {
-					node.SetAttribute(attr.Name, attr.Value)
-				}
-			}
-		}
-		if node.HasChildren() {
-			a.walkAtributes(node)
-		}
-	}
-}
-
-// Extend implement goldmark.Extender interface.
-func (a *Attributes) Extend(m goldmark.Markdown) {
-	if len(a.supportedTypes) == 0 {
-		return // nothing to change
-	}
-	m.Parser().AddOptions(
-		parser.WithBlockParsers(
-			util.Prioritized(a, 0)),
-		parser.WithASTTransformers(
-			util.Prioritized(a, 0),
-		),
-	)
-	m.Renderer().AddOptions(
-		renderer.WithNodeRenderers(
-			util.Prioritized(a, 0),
-		),
-	)
-}
-
-// RegisterFuncs implement renderer.NodeRenderer interface.
-func (a *Attributes) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
-	// not render
-	reg.Register(kindAttributes, func(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-		return ast.WalkSkipChildren, nil
-	})
+// NewParser return new attribute block parser.
+func NewParser() parser.BlockParser {
+	return defaultAttrParser
 }
 
 // Trigger implement parser.BlockParser interface.
-func (a *Attributes) Trigger() []byte {
+func (a *attrParser) Trigger() []byte {
 	return []byte{'{'}
 }
 
-var ckAttributes = parser.NewContextKey()
-
 // Open implement parser.BlockParser interface.
-func (a *Attributes) Open(parent ast.Node, reader text.Reader, pc parser.Context) (ast.Node, parser.State) {
+func (a *attrParser) Open(parent ast.Node, reader text.Reader, pc parser.Context) (ast.Node, parser.State) {
 	if attrs, ok := parser.ParseAttributes(reader); ok {
 		// add attributes
-		var node = &attributesBlock{
-			BaseBlock: ast.BaseBlock{},
-		}
+		var node = New()
 		for _, attr := range attrs {
 			node.SetAttribute(attr.Name, attr.Value)
 		}
-		// store in context
-		list, ok := pc.Get(ckAttributes).([]*attributesBlock)
-		if !ok || list == nil {
-			list = []*attributesBlock{node}
-		} else {
-			list = append(list, node)
-		}
-		pc.Set(ckAttributes, list)
 		return node, parser.NoChildren
 	}
 	return nil, parser.RequireParagraph
 }
 
 // Continue implement parser.BlockParser interface.
-func (a *Attributes) Continue(node ast.Node, reader text.Reader, pc parser.Context) parser.State {
+func (a *attrParser) Continue(node ast.Node, reader text.Reader, pc parser.Context) parser.State {
 	return parser.Close
 }
 
 // Close implement parser.BlockParser interface.
-func (a *Attributes) Close(node ast.Node, reader text.Reader, pc parser.Context) {
+func (a *attrParser) Close(node ast.Node, reader text.Reader, pc parser.Context) {
 	// nothing to do
 }
 
 // CanInterruptParagraph implement parser.BlockParser interface.
-func (a *Attributes) CanInterruptParagraph() bool {
+func (a *attrParser) CanInterruptParagraph() bool {
 	return true
 }
 
 // CanAcceptIndentedLine implement parser.BlockParser interface.
-func (a *Attributes) CanAcceptIndentedLine() bool {
+func (a *attrParser) CanAcceptIndentedLine() bool {
 	return false
 }
+
+type transformer struct{}
+
+var defaultTransformer = new(transformer)
+
+// NewTransformer return new AST Transformer for attributes block.
+func NewTransformer() parser.ASTTransformer {
+	return defaultTransformer
+}
+
+// Transform implement parser.Transformer interface.
+func (a *transformer) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
+	// collect all attributes block
+	var attributes = make([]ast.Node, 0, 1000)
+	ast.Walk(node, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
+		if entering && node.Kind() == KindAttributes {
+			attributes = append(attributes, node)
+			return ast.WalkSkipChildren, nil
+		}
+		return ast.WalkContinue, nil
+	})
+	// set attributes to next block sibling
+	for _, attr := range attributes {
+		if next := attr.NextSibling(); next != nil &&
+			next.Type() == ast.TypeBlock &&
+			!next.HasBlankPreviousLines() {
+			// set attribute to sibling node
+			for _, attr := range attr.Attributes() {
+				if _, exist := next.Attribute(attr.Name); !exist {
+					next.SetAttribute(attr.Name, attr.Value)
+				}
+			}
+		}
+		// remove attributes node
+		attr.Parent().RemoveChild(attr.Parent(), attr)
+	}
+}
+
+type attrRender struct{}
+
+var defaultAttrRender = new(attrRender)
+
+// NewRender return new attributes block renderer.
+func NewRender() renderer.NodeRenderer {
+	return defaultAttrRender
+}
+
+// RegisterFuncs implement renderer.NodeRenderer interface.
+func (a *attrRender) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+	// not render
+	reg.Register(KindAttributes,
+		func(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+			return ast.WalkSkipChildren, nil
+		})
+}
+
+// attributes defines a markdown block attributes parser, render & extension.
+type attributes struct{}
+
+// Extend implement goldmark.Extender interface.
+func (a *attributes) Extend(m goldmark.Markdown) {
+	m.Parser().AddOptions(
+		parser.WithBlockParsers(
+			util.Prioritized(defaultAttrParser, 100)),
+		parser.WithASTTransformers(
+			util.Prioritized(defaultTransformer, 100),
+		),
+	)
+	m.Renderer().AddOptions(
+		renderer.WithNodeRenderers(
+			util.Prioritized(defaultAttrRender, 100),
+		),
+	)
+}
+
+// Extension is a goldmark.Extender with markdown block attributes support.
+var Extension goldmark.Extender = new(attributes)
+
+// Enable is a goldmark.Option with block attributes support.
+var Enable goldmark.Option = goldmark.WithExtensions(Extension)

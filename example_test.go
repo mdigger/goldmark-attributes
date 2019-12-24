@@ -9,7 +9,7 @@ import (
 )
 
 func Example() {
-	var md = goldmark.New(attributes.Enable())
+	var md = goldmark.New(attributes.Enable)
 	var source = []byte("{#id .class1}\ntext")
 	err := md.Convert(source, os.Stdout)
 	if err != nil {
