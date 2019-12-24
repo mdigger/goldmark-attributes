@@ -96,16 +96,18 @@ func (a *Attributes) walkAtributes(node ast.Node) {
 			if p := node.Parent(); p != nil {
 				p.RemoveChild(p, node)
 			}
-			if next != nil &&
-				next.Type() == ast.TypeBlock &&
-				!next.HasBlankPreviousLines() &&
-				a.isSupported(next.Kind()) {
-				// set attribute to sibling node
-				for _, attr := range attrs {
-					next.SetAttribute(attr.Name, attr.Value)
-				}
+			if next == nil {
+				break
 			}
 			node = next
+			if node.Type() == ast.TypeBlock &&
+				!node.HasBlankPreviousLines() &&
+				a.isSupported(node.Kind()) {
+				// set attribute to sibling node
+				for _, attr := range attrs {
+					node.SetAttribute(attr.Name, attr.Value)
+				}
+			}
 		}
 		if node.HasChildren() {
 			a.walkAtributes(node)
