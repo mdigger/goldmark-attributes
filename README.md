@@ -21,7 +21,7 @@ together – what do you get? The sum of their fears.</p>
 ```
 
 ```go
-var md = goldmark.New(attributes.Options())
+var md = goldmark.New(attributes.Enable())
 var source = []byte("{#id .class1}\ntext")
 err := md.Convert(source, os.Stdout)
 if err != nil {

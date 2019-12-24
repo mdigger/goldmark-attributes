@@ -68,8 +68,8 @@ func Extension(nodes ...ast.NodeKind) *Attributes {
 	}
 }
 
-// Options return initialized goldmark.Option with block attributes support.
-func Options(nodes ...ast.NodeKind) goldmark.Option {
+// Enable return initialized goldmark.Option with block attributes support.
+func Enable(nodes ...ast.NodeKind) goldmark.Option {
 	return goldmark.WithExtensions(Extension(nodes...))
 }
 
@@ -84,27 +84,33 @@ func (a *Attributes) isSupported(k ast.NodeKind) bool {
 
 // Transform implement parser.Transformer interface.
 func (a *Attributes) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
-	// get attributes list from context
-	list, ok := pc.Get(ckAttributes).([]*attributesBlock)
-	if !ok || list == nil {
-		return
-	}
-	for _, n := range list {
-		// set attribute to sibling node
-		if nx := n.NextSibling(); nx != nil &&
-			nx.Type() == ast.TypeBlock &&
-			!nx.HasBlankPreviousLines() &&
-			a.isSupported(nx.Kind()) {
-			for _, attr := range n.Attributes() {
-				nx.SetAttribute(attr.Name, attr.Value)
+	a.walkAtributes(node)
+}
+
+func (a *Attributes) walkAtributes(node ast.Node) {
+	for node = node.FirstChild(); node != nil; node = node.NextSibling() {
+		if node.Kind() == kindAttributes {
+			attrs := node.Attributes() // get attributes
+			next := node.NextSibling() // next node
+			// remove attributes node
+			if p := node.Parent(); p != nil {
+				p.RemoveChild(p, node)
 			}
+			if next != nil &&
+				next.Type() == ast.TypeBlock &&
+				!next.HasBlankPreviousLines() &&
+				a.isSupported(next.Kind()) {
+				// set attribute to sibling node
+				for _, attr := range attrs {
+					next.SetAttribute(attr.Name, attr.Value)
+				}
+			}
+			node = next
 		}
-		// remove attributes node
-		if p := n.Parent(); p != nil {
-			p.RemoveChild(p, n)
+		if node.HasChildren() {
+			a.walkAtributes(node)
 		}
 	}
-	pc.Set(ckAttributes, nil) // remove from context
 }
 
 // Extend implement goldmark.Extender interface.
