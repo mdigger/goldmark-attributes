@@ -53,10 +53,10 @@ type attrParser struct{}
 
 var defaultParser = new(attrParser)
 
-// NewParser return new attributes block parser.
-func NewParser() parser.BlockParser {
-	return defaultParser
-}
+// // NewParser return new attributes block parser.
+// func NewParser() parser.BlockParser {
+// 	return defaultParser
+// }
 
 // Trigger implement parser.BlockParser interface.
 func (a *attrParser) Trigger() []byte {
@@ -100,10 +100,10 @@ type transformer struct{}
 
 var defaultTransformer = new(transformer)
 
-// NewTransformer return new AST Transformer for attributes block.
-func NewTransformer() parser.ASTTransformer {
-	return defaultTransformer
-}
+// // NewTransformer return new AST Transformer for attributes block.
+// func NewTransformer() parser.ASTTransformer {
+// 	return defaultTransformer
+// }
 
 // Transform implement parser.Transformer interface.
 func (a *transformer) Transform(node *ast.Document, reader text.Reader, pc parser.Context) {
@@ -137,10 +137,10 @@ type attrRender struct{}
 
 var defaultRenderer = new(attrRender)
 
-// NewRenderer return new attributes block renderer.
-func NewRenderer() renderer.NodeRenderer {
-	return defaultRenderer
-}
+// // NewRenderer return new attributes block renderer.
+// func NewRenderer() renderer.NodeRenderer {
+// 	return defaultRenderer
+// }
 
 // RegisterFuncs implement renderer.NodeRenderer interface.
 func (a *attrRender) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
