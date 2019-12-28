@@ -15,20 +15,20 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
-// Block are parsed attributes block.
-type Block struct {
+// block are parsed attributes block.
+type block struct {
 	ast.BaseBlock
 }
 
-// New return new attributes block.
-func New() *Block {
-	return &Block{
-		BaseBlock: ast.BaseBlock{},
-	}
-}
+// // New return new attributes block.
+// func New() *block {
+// 	return &block{
+// 		BaseBlock: ast.BaseBlock{},
+// 	}
+// }
 
 // Dump implements Node.Dump.
-func (a *Block) Dump(source []byte, level int) {
+func (a *block) Dump(source []byte, level int) {
 	attrs := a.Attributes()
 	list := make(map[string]string, len(attrs))
 	for _, attr := range attrs {
@@ -45,7 +45,7 @@ func (a *Block) Dump(source []byte, level int) {
 var KindAttributes = ast.NewNodeKind("Attributes")
 
 // Kind implements Node.Kind.
-func (a *Block) Kind() ast.NodeKind {
+func (a *block) Kind() ast.NodeKind {
 	return KindAttributes
 }
 
@@ -67,7 +67,9 @@ func (a *attrParser) Trigger() []byte {
 func (a *attrParser) Open(parent ast.Node, reader text.Reader, pc parser.Context) (ast.Node, parser.State) {
 	if attrs, ok := parser.ParseAttributes(reader); ok {
 		// add attributes
-		var node = New()
+		var node = &block{
+			BaseBlock: ast.BaseBlock{},
+		}
 		for _, attr := range attrs {
 			node.SetAttribute(attr.Name, attr.Value)
 		}
