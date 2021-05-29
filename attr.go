@@ -100,14 +100,12 @@ func (a *transformer) Transform(node *ast.Document, reader text.Reader, pc parse
 
 	// set attributes to next block sibling
 	for _, attr := range attributes {
-		if !attr.HasBlankPreviousLines() {
-			prev := attr.PreviousSibling()
-			if prev != nil && prev.Type() == ast.TypeBlock {
-				// set attribute to sibling node
-				for _, attr := range attr.Attributes() {
-					if _, exist := prev.Attribute(attr.Name); !exist {
-						prev.SetAttribute(attr.Name, attr.Value)
-					}
+		prev := attr.PreviousSibling()
+		if prev != nil && prev.Type() == ast.TypeBlock &&
+			!attr.HasBlankPreviousLines() {
+			for _, attr := range attr.Attributes() {
+				if _, exist := prev.Attribute(attr.Name); !exist {
+					prev.SetAttribute(attr.Name, attr.Value)
 				}
 			}
 		}
