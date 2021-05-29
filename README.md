@@ -6,10 +6,10 @@
 ```markdown
 # Document {#main}
 
-{.epigraph}
 > Why, you may take the most gallant sailor, the most intrepid airman or the
 > most audacious soldier, put them at a table together – what do you get? The
 > sum of their fears.
+{.epigraph}
 ```
 
 ```html

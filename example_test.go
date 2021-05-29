@@ -10,8 +10,8 @@ import (
 
 func Example() {
 	var source = []byte(`
-{#id .class}
 text
+{#id .class}
 `)
 	var md = goldmark.New(attributes.Enable)
 	err := md.Convert(source, os.Stdout)

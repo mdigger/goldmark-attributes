@@ -1,2 +1,4 @@
 github.com/yuin/goldmark v1.1.18 h1:0Gpa+rpkhzQehagonRrmf0h1IHidn5DfSLM6oUjx5EU=
 github.com/yuin/goldmark v1.1.18/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
+github.com/yuin/goldmark v1.3.7 h1:NSaHgaeJFCtWXCBkBKXw0rhgMuJ0VoE9FB5mWldcrQ4=
+github.com/yuin/goldmark v1.3.7/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
